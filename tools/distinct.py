@@ -1,14 +1,17 @@
 #!/usr/bin/env python
 import sys
 import json
+import codecs
 
 
 def main(args):
 	field = args[0]
 	array = json.load(sys.stdin)
-	s = {e[field] for e in array}
+	s = {unicode(e[field]) for e in array}
+	w = codecs.getwriter('utf-8')(sys.stdout)
 	for e in sorted(s):
-		print e
+		w.write(e + u"\n")
+	w.flush()
 
 
 if __name__ == '__main__':
