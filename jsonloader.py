@@ -37,7 +37,7 @@ def main():
 		logLevel = logging.INFO
 		logging.basicConfig(level=logLevel)
 	logging.debug("Starting importer.")
-	inputFile = codecs.open(args.input_file, "r", "utf-8") if args.input_file != "-" else codecs.getreader("utf-i")(sys.stdin)
+	inputFile = codecs.open(args.input_file, "r", "utf-8") if args.input_file != "-" else codecs.getreader("utf-8")(sys.stdin)
 	data = json.load(inputFile)
 	batches = grouper(args.batch_size, data)
 	for b in batches:
