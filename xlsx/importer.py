@@ -23,6 +23,7 @@ header_keys = {
 def lower(x): return x.lower()
 
 key_processors = {x : lower for x in [u'status', u'format', u'language', u'category']}
+key_processors['title'] = unicode
 
 def process_dict(d):
 	# bad code
