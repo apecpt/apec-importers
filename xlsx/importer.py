@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
 import itertools
@@ -17,18 +17,25 @@ header_keys = {
 	u'observações' : u'notes',
 	u'estado da obra' : u'status',
 	u'idioma' : u'language',
-	u'formato' : u'format'
+	u'formato' : u'content-type'
 }
 
 def lower(x): return x.lower()
+def guess_content_type(ext):
+	import mimetypes
+	type, encoding = mimetypes.guess_type("file.%s" %ext.lower())
+	if type is None:
+		raise RuntimeError("type not known for %s" % ext)
+	return type
 
-key_processors = {x : lower for x in [u'status', u'format', u'language', u'category']}
-key_processors['title'] = unicode
+key_processors = {x : lower for x in [u'status', u'language', u'category']}
+#key_processors['title'] = unicode
+key_processors['content-type'] = guess_content_type
 
 def process_dict(d):
 	# bad code
 	r = {}
-	for k, v in d.iteritems():
+	for k, v in d.items():
 		f = key_processors.get(k, lambda x : x)
 		r[k] = f(v)
 	return r
@@ -58,7 +65,7 @@ def similar(l):
 
 def problematic_categories(d):
 	for c1, c2 in similar(by_key(d, u'classificação')):
-		print "%s --> %s" % (c1, c2)
+		print("%s --> %s" % (c1, c2))
 
 def main(args):
     filename = args[0]
