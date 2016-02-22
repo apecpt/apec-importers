@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 import itertools
@@ -17,20 +17,13 @@ header_keys = {
 	u'observações' : u'notes',
 	u'estado da obra' : u'status',
 	u'idioma' : u'language',
-	u'formato' : u'content-type'
+	u'formato' : u'extension'
 }
 
-def lower(x): return x.lower()
-def guess_content_type(ext):
-	import mimetypes
-	type, encoding = mimetypes.guess_type("file.%s" %ext.lower())
-	if type is None:
-		raise RuntimeError("type not known for %s" % ext)
-	return type
+def lower(x): return x.lower().strip()
 
-key_processors = {x : lower for x in [u'status', u'language', u'category']}
-#key_processors['title'] = unicode
-key_processors['content-type'] = guess_content_type
+key_processors = {x : lower for x in [u'status', u'language', u'category', u'extension']}
+key_processors['title'] = key_processors['author'] = lambda x : str(x).strip()
 
 def process_dict(d):
 	# bad code
@@ -42,8 +35,14 @@ def process_dict(d):
 
 def sheet2dict(sheet):
     headers = [cell.value for cell in sheet.rows[0]]
-    d = [{header_keys[k.lower()] : v.value for (k, v) in zip(headers, row) if k is not None and v.value is not None} for row in sheet.rows[1:]]
-    return [process_dict(i) for i in d]
+    d = [{header_keys[k.lower()] : v.value for (k, v) in zip(headers, row) if k is not None and (v.value is not None and v.value != "")} for row in sheet.rows[1:]]
+    processed = [process_dict(i) for i in d if len(i) > 0]
+    for p in processed:
+        for k in ('title', 'author', 'extension'):
+          if k not in p:
+                raise RuntimeError("%s not found in %s" %(k, p))
+    return processed
+
 
 
 def by_key(d, key):
